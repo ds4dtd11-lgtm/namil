@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="nativebridge-hide-navigation" content="true">
+<meta name="theme-color" content="#16a34a">
+<title>항공방제 관리</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --g:#16a34a;--g2:#15803d;--gm:#dcfce7;--gb:#f0fdf4;
+  --dk:#111827;--bg:#f9fafb;
+  --t1:#111827;--t2:#6b7280;--t3:#9ca3af;
+  --bd:#e5e7eb;--bd2:#d1d5db;
+  --red:#ef4444;--blue:#2563eb;
+  --sh:0 1px 6px rgba(0,0,0,.08);--r:14px;--r2:10px;
+  --hh:54px;--nh:62px
+}
+body{font-family:"Noto Sans KR",Apple SD Gothic Neo,sans-serif;background:var(--bg);color:var(--t1);font-size:15px;overflow-x:hidden}
+.hdr{position:fixed;top:0;left:0;right:0;height:var(--hh);background:#fff;border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 14px;gap:10px;z-index:90;box-shadow:var(--sh)}
+.hdr-logo{display:flex;align-items:center;gap:5px;background:var(--g);border-radius:8px;padding:5px 9px;cursor:pointer}
+.hdr-logo span{font-size:11px;font-weight:800;color:#fff}
+.hdr-tit{flex:1;font-size:16px;font-weight:900;color:var(--dk)}
+.hdr-btn{width:34px;height:34px;border:none;background:var(--bg);border-radius:50%;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nh);background:#fff;border-top:1px solid var(--bd);display:flex;z-index:90;box-shadow:0 -1px 6px rgba(0,0,0,.06)}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:none;color:var(--t3);font-family:inherit;cursor:pointer;padding:6px 0;transition:.12s}
+.ni.on{color:var(--g)}
+.ni-ic{font-size:22px;line-height:1}
+.ni-lb{font-size:9px;font-weight:700}
+.ni-center{position:relative;overflow:visible}
+.ni-center-btn{width:52px;height:52px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:900;box-shadow:0 4px 12px rgba(22,163,74,.4);position:relative;top:-10px}
+.wrap{padding:calc(var(--hh)+12px) 14px calc(var(--nh)+12px)}
+.pg{display:none}.pg.on{display:block;animation:fu .18s ease}
+@keyframes fu{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.card{background:#fff;border-radius:var(--r);border:1px solid var(--bd);padding:15px;box-shadow:var(--sh);margin-bottom:12px}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-t{font-size:14px;font-weight:700;color:var(--dk);display:flex;align-items:center;gap:6px}
+.fg{margin-bottom:11px}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--t2);margin-bottom:3px}
+.fi{width:100%;padding:10px 12px;border:1.5px solid var(--bd2);border-radius:var(--r2);font-family:inherit;font-size:14px;background:#fff;color:var(--t1);outline:none;transition:border-color .15s}
+.fi:focus{border-color:var(--g)}
+select.fi{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%236b7280' d='M5 6L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:28px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.fi-wrap{position:relative}.fi-wrap .fi{padding-right:38px}
+.fi-ic{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;cursor:pointer;color:var(--t3)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:10px 14px;border-radius:var(--r2);border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.12s;white-space:nowrap}
+.btn:active{opacity:.85;transform:scale(.98)}
+.btn-g{background:var(--g);color:#fff}
+.btn-dk{background:var(--dk);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-gray{background:var(--bg);color:var(--t2);border:1px solid var(--bd)}
+.btn-ol{background:transparent;color:var(--g);border:1.5px solid var(--g)}
+.btn-bl{width:100%}
+.btn-lg{padding:14px;font-size:15px;border-radius:var(--r)}
+.btn-sm{padding:6px 11px;font-size:11px}
+.srch{position:relative;margin-bottom:10px}
+.srch .fi{padding-left:36px}
+.srch-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--t3);pointer-events:none}
+.fitem{background:#fff;border-radius:var(--r2);border:1px solid var(--bd);padding:13px;display:flex;align-items:center;gap:11px;box-shadow:var(--sh);margin-bottom:8px}
+.favt{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0}
+.ac0{background:#dcfce7;color:#15803d}.ac1{background:#dbeafe;color:#1e40af}
+.ac2{background:#fce7f3;color:#9d174d}.ac3{background:#fef3c7;color:#92400e}
+.ac4{background:#ede9fe;color:#5b21b6}.ac5{background:#ffedd5;color:#c2410c}
+.fbd{flex:1;min-width:0}
+.fnm{font-size:15px;font-weight:700}
+.ftel{font-size:12px;color:var(--t3);margin-top:2px}
+.fbts{display:flex;gap:6px;flex-shrink:0}
+.fbt{width:34px;height:34px;border:none;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.fbt.call{background:var(--gm)}.fbt.edit{background:#dbeafe}.fbt.del{background:#fee2e2}
+.ibox{background:var(--bg);border:1px solid var(--bd);border-radius:var(--r2);padding:12px;margin-bottom:9px;position:relative}
+.ibox-no{font-size:10px;font-weight:700;color:var(--g);background:var(--gm);padding:2px 7px;border-radius:10px;display:inline-block;margin-bottom:8px}
+.ibox-del{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--red);font-size:18px;cursor:pointer}
+.ibox-sum{text-align:right;font-size:12px;color:var(--t3);margin-top:7px}
+.ibox-sum b{color:var(--g);font-size:15px}
+.ppick{background:#fff;border:1.5px solid var(--g);border-radius:var(--r2);overflow:hidden;display:none;margin-top:6px;box-shadow:0 4px 12px rgba(22,163,74,.15)}
+.ppick-row{padding:11px 13px;cursor:pointer;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;font-size:13px}
+.ppick-row:last-child{border-bottom:none}
+.ppick-row:active{background:var(--gm)}
+.ppick-nm{font-weight:600}.ppick-pr{color:var(--g);font-weight:700}
+.tot-box{background:var(--dk);border-radius:var(--r2);padding:14px 16px;margin-top:6px}
+.tot-row{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.65);margin-bottom:5px}
+.tot-main{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.12);padding-top:10px;margin-top:6px}
+.tot-lbl{font-size:13px;font-weight:700;color:rgba(255,255,255,.8)}
+.tot-amt{font-size:22px;font-weight:900;color:#6ee7b7}
+.tax-seg{display:flex;gap:6px;margin-top:5px}
+.tax-btn{flex:1;padding:9px;border-radius:var(--r2);border:1.5px solid var(--bd2);background:#fff;font-family:inherit;font-size:12px;font-weight:700;color:var(--t3);cursor:pointer;transition:.15s}
+.tax-btn.on{border-color:var(--g);background:var(--gm);color:var(--g2)}
+.itabs{display:flex;background:#fff;border-bottom:2px solid var(--bd);position:sticky;top:var(--hh);z-index:50}
+.itb{flex:1;padding:10px 4px;border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
+.itb.on{color:var(--g);border-bottom-color:var(--g)}
+.inv-wrap{background:#fff;border:1px solid #ccc;border-radius:8px;padding:18px;font-size:12px;color:#000;line-height:1.5;margin-bottom:8px}
+.inv-title{text-align:center;font-size:17px;font-weight:900;letter-spacing:.12em;margin-bottom:14px;border-bottom:2px solid #000;padding-bottom:10px}
+.inv-tbl{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:11px}
+.inv-tbl th,.inv-tbl td{border:1px solid #000;padding:5px 4px;text-align:center}
+.inv-tbl th{background:#f0f0f0;font-weight:700}
+.inv-tbl td:first-child{text-align:left;padding-left:7px}
+.inv-notice{font-size:9px;color:#555;line-height:1.8;margin-bottom:8px}
+.inv-acct{text-align:center;border:1px solid #ccc;border-radius:4px;padding:7px;font-size:11px;font-weight:600;margin-bottom:8px}
+.hist-date{font-size:11px;font-weight:700;color:var(--t2);padding:5px 2px 3px;margin-top:8px;border-bottom:1px solid var(--bd);margin-bottom:5px}
+.hist-item{background:#fff;border:1px solid var(--bd);border-radius:var(--r2);padding:12px 13px;margin-bottom:7px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh)}
+.hist-ic{width:36px;height:36px;border-radius:9px;background:var(--gm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.hist-bd{flex:1;min-width:0}
+.hist-nm{font-size:14px;font-weight:700}
+.hist-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.hist-acts{display:flex;gap:5px;margin-top:5px}
+.hist-act{background:none;border:none;font-size:16px;cursor:pointer;color:var(--t3);padding:2px}
+.hist-rt{text-align:right;flex-shrink:0}
+.hist-amt{font-size:15px;font-weight:900;color:var(--g)}
+.bdg{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.bdg-y{background:#fef3c7;color:#92400e}.bdg-g{background:var(--gm);color:var(--g2)}
+.save-bar{position:fixed;bottom:var(--nh);left:0;right:0;padding:10px 14px;background:#fff;border-top:1px solid var(--bd);display:flex;gap:8px;z-index:80}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.ov.on{display:flex}
+.sh{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:16px 15px 30px;animation:su .22s ease}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sh-hnd{width:38px;height:4px;background:var(--bd);border-radius:2px;margin:0 auto 14px}
+.sh-t{font-size:17px;font-weight:700;margin-bottom:12px}
+.citem{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid var(--bd);cursor:pointer}
+.citem:active{background:var(--bg)}
+.cavt{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0}
+.cbd{flex:1}.cnm{font-size:14px;font-weight:600}.ctel{font-size:12px;color:var(--t3)}
+.set-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center;padding:16px}
+.set-ov.on{display:flex}
+.set-box{background:#fff;border-radius:var(--r);width:100%;max-width:480px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.set-hdr{display:flex;align-items:center;justify-content:space-between;padding:15px;border-bottom:1px solid var(--bd)}
+.set-hdr span{font-size:16px;font-weight:700}
+.set-close{width:30px;height:30px;border:none;background:var(--bg);border-radius:50%;font-size:15px;cursor:pointer}
+.set-body{flex:1;overflow-y:auto;padding:15px}
+.set-foot{padding:11px 15px;border-top:1px solid var(--bd);display:flex;gap:8px}
+.cap-ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.cap-ov.on{display:flex}
+.empty{text-align:center;padding:40px 16px;color:var(--t3)}
+.empty .ei{font-size:48px;margin-bottom:10px}
+.lbox{text-align:center;padding:36px 14px;color:var(--t3)}
+.lbox .ls{width:32px;height:32px;border:3px solid #e5e7eb;border-top-color:var(--g);border-radius:50%;animation:cspin .8s linear infinite;margin:0 auto 12px}
+.toast{position:fixed;bottom:calc(var(--nh)+10px);left:50%;transform:translateX(-50%);background:var(--dk);color:#fff;padding:9px 18px;border-radius:22px;font-size:12px;font-weight:600;z-index:999;white-space:nowrap;opacity:0;transition:opacity .18s;pointer-events:none}
+.toast.on{opacity:1}
+@keyframes cspin{to{transform:rotate(360deg)}}
+@media print{.hdr,.bnav,.save-bar,.no-print,.cap-ov,.toast{display:none!important}.wrap{padding:0!important}}
+</style>
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+<header class="hdr" id="main-hdr">
+  <span style="font-size:22px">✈️</span>
+  <span class="hdr-tit" id="hdr-tit">항공방제 관리시스템</span>
+  <button class="hdr-btn no-print" onclick="openSet()">⚙️</button>
+</header>
+<div class="wrap">
+<div class="pg on" id="pg-home">
+  <div id="h-stats"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <span style="font-size:13px;font-weight:700">최근 명세서</span>
+    <button class="btn btn-sm btn-ol" onclick="goPage('invoice')">전체보기</button>
+  </div>
+  <div id="h-recent"></div>
+  <div style="margin-top:14px" id="h-quick"></div>
+</div>
+
+<div class="pg" id="pg-farmer">
+  <div class="card">
+    <div class="card-hd"><span class="card-t">📝 <span id="fm-title">농가 등록</span></span></div>
+    <button class="btn btn-gray btn-bl no-print" style="margin-bottom:12px" onclick="importContact()">📱 연락처에서 불러오기</button>
+    <div class="fr2" style="margin-bottom:9px">
+      <div class="fg" style="margin:0"><label class="fl">성명 *</label><input type="text" id="fm-name" class="fi" placeholder="이름"></div>
+      <div class="fg" style="margin:0"><label class="fl">전화번호</label><input type="tel" id="fm-tel" class="fi" placeholder="010-0000-0000" oninput="autoTel(this)"></div>
+    </div>
+    <div class="fg"><label class="fl">주소</label><input type="text" id="fm-addr" class="fi" placeholder="주소 (선택)"></div>
+    <div class="fg" style="margin-bottom:0"><label class="fl">주민/사업자번호</label><input type="text" id="fm-id2" class="fi" placeholder="선택사항"></div>
+    <input type="hidden" id="fm-eid">
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <button class="btn btn-g" style="flex:2" onclick="saveFarmer()">💾 저장</button>
+    <button class="btn btn-gray" style="flex:1" onclick="cancelEdit()">취소</button>
+  </div>
+  <div class="srch"><span class="srch-ic">🔍</span><input type="text" class="fi" placeholder="이름, 전화번호 검색..." oninput="renderFarmerList(this.value)"></div>
+  <div id="farmer-list"></div>
+</div>
+<div class="pg" id="pg-invoice">
+  <div class="itabs no-print">
+    <button class="itb on" id="itb-input" onclick="goInvTab('input')">입력</button>
+    <button class="itb" id="itb-inv" onclick="goInvTab('inv')">명세서</button>
+    <button class="itb" id="itb-hist" onclick="goInvTab('hist')">내역</button>
+    <button class="itb" id="itb-ledger" onclick="goInvTab('ledger')">장부</button>
+  </div>
+  <div id="inv-input" style="padding-top:8px">
+    <div class="card">
+      <div class="card-hd"><span class="card-t">📅 기본 정보</span></div>
+      <div class="fr2">
+        <div class="fg" style="margin:0"><label class="fl">방제 날짜</label><input type="date" id="i-date" class="fi"></div>
+        <div class="fg" style="margin:0"><label class="fl">의뢰인</label>
+          <div class="fi-wrap"><input type="text" id="i-name" class="fi" placeholder="이름"><span class="fi-ic" onclick="openFarmerPick()">🔍</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><span class="card-t">✈️ 방제 항목</span><button class="btn btn-sm btn-g no-print" onclick="addItem()">+ 추가</button></div>
+      <div id="items-wrap"></div>
+      <div onclick="addItem()" style="width:100%;padding:13px;border:2px dashed var(--bd2);border-radius:var(--r2);background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:11px">
+        <span style="font-size:18px;color:var(--g)">+</span> 항목 추가
+      </div>
+      <div class="fg" style="margin-bottom:10px">
+        <label class="fl">세금 방식</label>
+        <div class="tax-seg">
+          <button class="tax-btn on" id="tax-none" onclick="setTax('none')">없음</button>
+          <button class="tax-btn" id="tax-vat" onclick="setTax('vat')">부가세 10%</button>
+          <button class="tax-btn" id="tax-zero" onclick="setTax('zero')">영세율 0%</button>
+        </div>
+      </div>
+      <div class="tot-box">
+        <div class="tot-row"><span>공급가액</span><span id="t-sub">₩0</span></div>
+        <div class="tot-row" id="t-tax-row" style="display:none"><span id="t-tax-lbl">부가세</span><span id="t-tax">₩0</span></div>
+        <div class="tot-main"><span class="tot-lbl">합 계</span><span class="tot-amt" id="t-total">₩0</span></div>
+      </div>
+    </div>
+    <div class="save-bar no-print" id="save-bar" style="display:flex">
+      <button class="btn btn-dk btn-bl btn-lg" onclick="saveInvoice()">💾 저장 및 내역 등록</button>
+    </div>
+    <div style="height:70px"></div>
+  </div>
+  <div id="inv-inv" style="display:none;padding-top:8px">
+    <div id="inv-content"><div class="empty"><div class="ei">📋</div><p>입력 탭에서 저장하면 명세서가 생성됩니다</p></div></div>
+    <div class="no-print" id="inv-btns" style="display:none;flex-direction:column;gap:8px;margin-top:8px">
+      <button class="btn btn-g btn-bl btn-lg" onclick="saveImage()">🖼 이미지 저장 (갤러리)</button>
+      <button class="btn btn-dk btn-bl btn-lg" onclick="sendText()">✉️ 문자/카톡 보내기</button>
+    </div>
+  </div>
+  <div id="inv-hist" style="display:none;padding-top:8px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span style="font-size:15px;font-weight:700">저장된 명세서 내역</span>
+      <button class="btn btn-sm btn-ol no-print" onclick="goInvTab('input')">+ 새 작성</button>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+  <div id="inv-ledger" style="display:none;padding-top:8px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <span style="font-size:15px;font-weight:700">거래처별 장부</span>
+      <button class="btn btn-sm btn-g no-print" onclick="openPayOv()">+ 입금 등록</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="card" style="padding:10px 7px;text-align:center;margin-bottom:0"><div style="font-size:13px;font-weight:900" id="l-req">₩0</div><div style="font-size:10px;color:var(--t3);margin-top:2px">총 청구</div></div>
+      <div class="card" style="padding:10px 7px;text-align:center;margin-bottom:0"><div style="font-size:13px;font-weight:900;color:var(--g)" id="l-paid">₩0</div><div style="font-size:10px;color:var(--t3);margin-top:2px">총 입금</div></div>
+      <div class="card" style="padding:10px 7px;text-align:center;margin-bottom:0"><div style="font-size:13px;font-weight:900;color:var(--red)" id="l-bal">₩0</div><div style="font-size:10px;color:var(--t3);margin-top:2px">총 잔액</div></div>
+    </div>
+    <div id="ledger-list"></div>
+  </div>
+</div>
+<div class="pg" id="pg-agri">
+  <div class="itabs no-print">
+    <button class="itb on" id="atb-pest" onclick="goAgriTab('pest')">🧪 농약검색</button>
+    <button class="itb" id="atb-disease" onclick="goAgriTab('disease')">🐛 병해충</button>
+    <button class="itb" id="atb-weed" onclick="goAgriTab('weed')">🌿 잡초도감</button>
+  </div>
+  <div id="agri-pest" style="padding-top:8px">
+    <div class="card" style="margin-bottom:8px">
+      <div class="card-hd"><span class="card-t">🧪 농약등록정보 검색</span></div>
+      <div class="fr2">
+        <div class="fg" style="margin-bottom:9px"><label class="fl">상표명</label><input type="text" id="ap-brand" class="fi" placeholder="예: 다코닐"></div>
+        <div class="fg" style="margin-bottom:9px"><label class="fl">용도</label>
+          <select id="ap-use" class="fi"><option value="">전체</option><option value="살균제">살균제</option><option value="살충제">살충제</option><option value="제초제">제초제</option><option value="살균살충제">살균살충제</option></select>
+        </div>
+      </div>
+      <div class="fr2">
+        <div class="fg" style="margin-bottom:9px"><label class="fl">작물명</label><input type="text" id="ap-crop" class="fi" placeholder="예: 벼, 고추"></div>
+        <div class="fg" style="margin-bottom:9px"><label class="fl">병해충명</label><input type="text" id="ap-pest" class="fi" placeholder="예: 역병"></div>
+      </div>
+      <div class="fg" style="margin-bottom:12px"><label class="fl">회사명/주성분</label><input type="text" id="ap-comp" class="fi" placeholder="예: 경농, 만코제브"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-gray" style="flex:1" onclick="pestReset()">🔄 초기화</button>
+        <button class="btn btn-g" style="flex:2;font-size:14px" onclick="pestSearch()">🔍 검색</button>
+      </div>
+    </div>
+    <div id="ap-sbar" style="padding:8px 12px;border-radius:10px;font-size:11px;font-weight:600;background:#eff6ff;color:#2563eb;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+      <span id="ap-sbar-ic">⏳</span><span id="ap-sbar-txt">농약 DB 준비 중...</span>
+    </div>
+    <div id="ap-result"><div class="empty"><div class="ei">🧪</div><p style="font-size:14px;font-weight:600">농약 검색</p><p style="font-size:12px;margin-top:6px;color:var(--t3)">상표명·작물명·병해충으로 검색</p></div></div>
+  </div>
+  <div id="agri-disease" style="display:none;padding-top:8px">
+    <div class="empty"><div class="ei">🐛</div><p style="font-size:14px;font-weight:700">병해충 진단</p><p style="font-size:12px;margin-top:8px;color:var(--t2);line-height:1.8">사진으로 AI 진단하는 기능<br>준비 중입니다</p></div>
+  </div>
+  <div id="agri-weed" style="display:none;padding-top:8px">
+    <div class="empty"><div class="ei">🌿</div><p style="font-size:14px;font-weight:700">잡초 도감</p><p style="font-size:12px;margin-top:8px;color:var(--t2);line-height:1.8">잡초 종류별 정보<br>준비 중입니다</p></div>
+  </div>
+</div>
+</div><!-- /wrap -->
+
+<nav class="bnav">
+  <button class="ni on" id="ni-home" onclick="goPage('home')"><span class="ni-ic">🏠</span><span class="ni-lb">홈</span></button>
+  <button class="ni" id="ni-hist" onclick="goPage('invoice');setTimeout(function(){goInvTab('hist');},100)"><span class="ni-ic">📁</span><span class="ni-lb">내역</span></button>
+  <button class="ni ni-center" onclick="goPage('invoice');setTimeout(function(){goInvTab('input');},100)">
+    <div class="ni-center-btn">↓</div>
+    <span class="ni-lb" style="color:var(--t3)">작성</span>
+  </button>
+  <button class="ni" id="ni-ledger" onclick="goPage('invoice');setTimeout(function(){goInvTab('ledger');},100)"><span class="ni-ic">📒</span><span class="ni-lb">장부</span></button>
+  <button class="ni" id="ni-agri" onclick="goPage('agri')"><span class="ni-ic">🌾</span><span class="ni-lb">농사정보</span></button>
+</nav>
+
+<!-- 농가 선택 -->
+<div class="ov" id="farmer-pick-ov">
+<div class="sh">
+  <div class="sh-hnd"></div>
+  <div class="sh-t">👨‍🌾 농가 선택</div>
+  <div class="srch"><span class="srch-ic">🔍</span><input type="text" class="fi" placeholder="이름 검색..." oninput="filterPickFarmers(this.value)" id="fp-search"></div>
+  <div id="farmer-pick-list"></div>
+  <button class="btn btn-gray btn-bl" style="margin-top:10px" onclick="closeOv('farmer-pick-ov')">닫기</button>
+</div></div>
+
+<!-- 연락처 -->
+<div class="ov" id="contact-ov">
+<div class="sh">
+  <div class="sh-hnd"></div>
+  <div class="sh-t">📱 연락처 선택</div>
+  <div class="srch"><span class="srch-ic">🔍</span><input type="text" class="fi" placeholder="이름 또는 번호 검색..." oninput="filterC(this.value)" id="c-search"></div>
+  <div id="c-list"></div>
+  <button class="btn btn-gray btn-bl" style="margin-top:12px" onclick="closeOv('contact-ov')">닫기</button>
+</div></div>
+
+<!-- 입금 등록 -->
+<div class="ov" id="pay-ov">
+<div class="sh">
+  <div class="sh-hnd"></div>
+  <div class="sh-t">💰 입금 등록</div>
+  <div class="fg"><label class="fl">농가</label><select id="pay-farmer" class="fi"><option value="">-- 선택 --</option></select></div>
+  <div class="fg"><label class="fl">입금일</label><input type="date" id="pay-date" class="fi"></div>
+  <div class="fg"><label class="fl">결제방식</label>
+    <div class="tax-seg">
+      <button class="tax-btn on" id="pt-cash" onclick="setPayType('cash')">현금</button>
+      <button class="tax-btn" id="pt-card" onclick="setPayType('card')">카드</button>
+      <button class="tax-btn" id="pt-trans" onclick="setPayType('trans')">계좌이체</button>
+    </div>
+  </div>
+  <input type="hidden" id="pay-type" value="cash">
+  <div class="fg"><label class="fl">입금액</label><input type="text" inputmode="numeric" id="pay-amt" class="fi" placeholder="0" oninput="fmtNum(this)"></div>
+  <div class="fg"><label class="fl">메모</label><input type="text" id="pay-memo" class="fi" placeholder="선택사항"></div>
+  <div style="display:flex;gap:8px;margin-top:6px">
+    <button class="btn btn-gray" style="flex:1" onclick="closeOv('pay-ov')">취소</button>
+    <button class="btn btn-g" style="flex:1" onclick="savePay()">등록</button>
+  </div>
+</div></div>
+
+<!-- 설정 -->
+<div class="set-ov" id="set-ov">
+<div class="set-box">
+  <div class="set-hdr"><span>⚙️ 설정</span><button class="set-close" onclick="closeOv('set-ov')">✕</button></div>
+  <div class="set-body">
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-hd"><span class="card-t">🏢 공급자 정보</span></div>
+      <div class="fr2">
+        <div class="fg" style="margin-bottom:9px"><label class="fl">사업자번호</label><input type="text" id="s-biz" class="fi" placeholder="000-00-00000"></div>
+        <div class="fg" style="margin-bottom:9px"><label class="fl">상호</label><input type="text" id="s-comp" class="fi"></div>
+      </div>
+      <div class="fr2">
+        <div class="fg" style="margin-bottom:9px"><label class="fl">대표자</label><input type="text" id="s-ceo" class="fi"></div>
+        <div class="fg" style="margin-bottom:9px"><label class="fl">연락처</label><input type="tel" id="s-tel" class="fi" placeholder="010-0000-0000"></div>
+      </div>
+      <div class="fg"><label class="fl">주소</label><input type="text" id="s-addr" class="fi"></div>
+      <div class="fr2">
+        <div class="fg" style="margin-bottom:9px"><label class="fl">업태</label><input type="text" id="s-biz2" class="fi"></div>
+        <div class="fg" style="margin-bottom:9px"><label class="fl">종목</label><input type="text" id="s-type" class="fi"></div>
+      </div>
+      <div class="fg" style="margin-bottom:0"><label class="fl">입금계좌</label><input type="text" id="s-acc" class="fi" placeholder="농협 000-00-000000 예금주명"></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-hd"><span class="card-t">📦 단가표</span><button class="btn btn-sm btn-g" onclick="addUnit()">+ 추가</button></div>
+      <div class="fr2" style="margin-bottom:10px">
+        <input type="text" id="u-name" class="fi" placeholder="품목명">
+        <input type="text" inputmode="numeric" id="u-price" class="fi" placeholder="단가" oninput="fmtNum(this)">
+      </div>
+      <div id="unit-list"></div>
+    </div>
+  </div>
+  <div class="set-foot">
+    <button class="btn btn-g" style="flex:2" onclick="saveSettings()">💾 저장</button>
+    <button class="btn btn-gray" style="flex:1" onclick="closeOv('set-ov')">닫기</button>
+  </div>
+</div></div>
+
+<div class="cap-ov" id="cap-ov">
+  <div style="width:44px;height:44px;border:4px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:cspin .8s linear infinite"></div>
+  <div style="color:#fff;font-size:14px;font-weight:700">이미지 생성 중...</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+
+
+
+
+
+// ═══ DB ═══
+function dbGet(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}
+function dbSet(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
+// ═══ 유틸 ═══
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function numFmt(n){return Number(n||0).toLocaleString();}
+function parseNum(v){return parseFloat((v||'').toString().replace(/,/g,''))||0;}
+function fmtNum(el){var n=parseFloat((el.value||'').replace(/[^0-9.]/g,''));if(!isNaN(n))el.value=n.toLocaleString();}
+function autoTel(el){var d=(el.value||'').replace(/[^0-9]/g,'');if(d.length===11)el.value=d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7);else if(d.length===10)el.value=d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);}
+function autoTelVal(v){var d=(v||'').replace(/[^0-9]/g,'');if(d.length===11)return d.slice(0,3)+'-'+d.slice(3,7)+'-'+d.slice(7);if(d.length===10)return d.slice(0,3)+'-'+d.slice(3,6)+'-'+d.slice(6);return v;}
+var _tt;
+function toast(m,d){var el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(_tt);_tt=setTimeout(function(){el.classList.remove('on');},(d||2400));}
+function closeOv(id){document.getElementById(id).classList.remove('on');}
+var COLORS=['ac0','ac1','ac2','ac3','ac4','ac5'];
+function acColor(name){var c=0;for(var i=0;i<(name||'').length;i++)c+=(name||'').charCodeAt(i);return COLORS[c%6];}
+
+// ═══ 페이지 네비 ═══
+var curPage='home', curInvTab='input', curAgriTab='pest', curRec=null, editId=null;
+
+function goPage(p){
+  document.querySelectorAll('.pg').forEach(function(x){x.classList.remove('on');});
+  document.querySelectorAll('.ni').forEach(function(x){x.classList.remove('on');});
+  document.getElementById('pg-'+p).classList.add('on');
+  var ni=document.getElementById('ni-'+p);
+  if(ni) ni.classList.add('on');
+  var titles={home:'항공방제 관리시스템',farmer:'농가 관리',invoice:'거래명세서',agri:'농사 정보'};
+  document.getElementById('hdr-tit').textContent=titles[p]||'항공방제';
+  curPage=p;
+  var sb=document.getElementById('save-bar');
+  if(sb) sb.style.display=(p==='invoice'&&curInvTab==='input')?'flex':'none';
+  if(p==='home') renderHome();
+  if(p==='farmer') renderFarmerList('');
+  if(p==='invoice') goInvTab(curInvTab);
+  if(p==='agri') goAgriTab(curAgriTab);
+}
+
+function goInvTab(t){
+  curInvTab=t;
+  ['input','inv','hist','ledger'].forEach(function(x){
+    var el=document.getElementById('inv-'+x);
+    if(el) el.style.display=x===t?'block':'none';
+    var tb=document.getElementById('itb-'+x);
+    if(tb) tb.classList.toggle('on',x===t);
+  });
+  var sb=document.getElementById('save-bar');
+  if(sb) sb.style.display=t==='input'?'flex':'none';
+  if(t==='hist') renderHist();
+  if(t==='ledger') renderLedger();
+  if(t==='inv'&&curRec) renderInvoice(curRec);
+}
+
+// ═══ 홈 ═══
+function renderHome(){
+  var farmers=dbGet('farmers',[]);
+  var invoices=dbGet('invoices',[]);
+  var pays=dbGet('payments',[]);
+
+  var now=new Date();
+  var ym=now.getFullYear()+'-'+(now.getMonth()+1<10?'0':'')+(now.getMonth()+1);
+  var mInvs=invoices.filter(function(r){return (r.date||'').startsWith(ym);});
+  var mAmt=mInvs.reduce(function(s,r){return s+(r.total||0);},0);
+  var totUnpaid=invoices.reduce(function(s,r){return s+(r.total||0);},0)
+    -pays.reduce(function(s,p){return s+(p.amount||0);},0);
+
+  // 통계 카드 - 모두 DOM으로
+  var stats=document.getElementById('h-stats');
+  stats.innerHTML='';
+  var grid1=document.createElement('div');
+  grid1.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px';
+
+  // 이번달 청구액
+  var c1=document.createElement('div');c1.className='card';
+  c1.style.cssText='margin:0;background:var(--dk);padding:18px 16px;cursor:pointer';
+  c1.innerHTML='<div style="font-size:26px;font-weight:900;color:#6ee7b7">₩'+numFmt(mAmt)+'</div>'
+    +'<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px">이번달 청구액</div>';
+  c1.onclick=function(){goPage('invoice');setTimeout(function(){goInvTab('ledger');},150);};
+
+  // 이번달 건수
+  var c2=document.createElement('div');c2.className='card';
+  c2.style.cssText='margin:0;padding:18px 16px';
+  c2.innerHTML='<div style="font-size:32px;font-weight:900;color:var(--dk)">'+mInvs.length+'</div>'
+    +'<div style="font-size:12px;color:var(--t3);margin-top:4px">이번달 건수</div>';
+
+  // 등록 농가
+  var c3=document.createElement('div');c3.className='card';
+  c3.style.cssText='margin:0;padding:18px 16px;cursor:pointer';
+  c3.innerHTML='<div style="font-size:32px;font-weight:900;color:var(--dk)">'+farmers.length+'</div>'
+    +'<div style="font-size:12px;color:var(--t3);margin-top:4px">등록 농가</div>';
+  c3.onclick=function(){goPage('farmer');};
+
+  // 총 명세서
+  var c4=document.createElement('div');c4.className='card';
+  c4.style.cssText='margin:0;padding:18px 16px;cursor:pointer';
+  c4.innerHTML='<div style="font-size:32px;font-weight:900;color:var(--dk)">'+invoices.length+'</div>'
+    +'<div style="font-size:12px;color:var(--t3);margin-top:4px">총 명세서</div>';
+  c4.onclick=function(){goPage('invoice');setTimeout(function(){goInvTab('hist');},150);};
+
+  grid1.appendChild(c1);grid1.appendChild(c2);grid1.appendChild(c3);grid1.appendChild(c4);
+  stats.appendChild(grid1);
+
+  // 최근 명세서
+  var rel=document.getElementById('h-recent');
+  rel.innerHTML='';
+  var recent=invoices.slice(0,3);
+  if(!recent.length){
+    rel.innerHTML='<div style="text-align:center;padding:14px;color:var(--t3);font-size:13px">저장된 명세서가 없습니다</div>';
+  } else {
+    recent.forEach(function(r){
+      var div=document.createElement('div');
+      div.className='hist-item'; div.style.cursor='pointer';
+      div.innerHTML='<div class="hist-ic">📋</div>'
+        +'<div class="hist-bd"><div class="hist-nm">'+esc(r.name)+'</div>'
+        +'<div class="hist-sub">'+esc(r.date||'')+' · '+(r.items||[]).map(function(it){return esc(it.n);}).join(', ')+'</div></div>'
+        +'<div class="hist-rt"><div class="hist-amt">₩'+numFmt(r.total)+'</div>'
+        +'<span class="bdg '+(r.paid?'bdg-g':'bdg-y')+'">'+(r.paid?'완납':'미수금')+'</span></div>';
+      div.onclick=(function(rid){return function(){
+        goPage('invoice');setTimeout(function(){viewRec(rid);},150);
+      };})(r.id);
+      rel.appendChild(div);
+    });
+  }
+
+  // 빠른 메뉴
+  var quick=document.getElementById('h-quick');
+  quick.innerHTML='<div style="font-size:13px;font-weight:700;margin-bottom:8px">빠른 메뉴</div>';
+  var grid2=document.createElement('div');
+  grid2.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px';
+
+  var m1=document.createElement('div');m1.className='card';
+  m1.style.cssText='margin:0;cursor:pointer;padding:18px 10px;text-align:center';
+  m1.innerHTML='<div style="font-size:36px;margin-bottom:8px">📋</div><div style="font-size:14px;font-weight:700">명세서 작성</div>';
+  m1.onclick=function(){goPage('invoice');setTimeout(function(){goInvTab('input');},150);};
+
+  var m2=document.createElement('div');m2.className='card';
+  m2.style.cssText='margin:0;cursor:pointer;padding:18px 10px;text-align:center';
+  m2.innerHTML='<div style="font-size:36px;margin-bottom:8px">📒</div>'
+    +'<div style="font-size:14px;font-weight:700">거래 장부</div>'
+    +'<div style="font-size:11px;font-weight:700;margin-top:4px;color:'+(totUnpaid>0?'var(--red)':'var(--g)')+'">'+(totUnpaid>0?'미수금 ₩'+numFmt(Math.max(0,totUnpaid)):'전액 완납')+'</div>';
+  m2.onclick=function(){goPage('invoice');setTimeout(function(){goInvTab('ledger');},150);};
+
+  grid2.appendChild(m1);grid2.appendChild(m2);
+  quick.appendChild(grid2);
+}
+
+// ═══ 농가 관리 ═══
+function saveFarmer(){
+  var name=(document.getElementById('fm-name').value||'').trim();
+  if(!name){toast('⚠ 성명 입력');return;}
+  var eid=document.getElementById('fm-eid').value;
+  var farmers=dbGet('farmers',[]);
+  var f={id:eid||'F'+Date.now(),name:name,tel:document.getElementById('fm-tel').value,addr:document.getElementById('fm-addr').value,id2:document.getElementById('fm-id2').value};
+  if(eid){var idx=farmers.findIndex(function(x){return x.id===eid;});if(idx>=0)farmers[idx]=f;else farmers.unshift(f);}
+  else farmers.unshift(f);
+  dbSet('farmers',farmers); cancelEdit(); renderFarmerList('');
+  toast(eid?'✅ 수정 완료':'✅ 농가 등록 완료');
+}
+function cancelEdit(){
+  ['fm-name','fm-tel','fm-addr','fm-id2','fm-eid'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('fm-title').textContent='농가 등록';
+}
+function editFarmer(id){
+  var f=dbGet('farmers',[]).find(function(x){return x.id===id;}); if(!f) return;
+  document.getElementById('fm-name').value=f.name||'';
+  document.getElementById('fm-tel').value=f.tel||'';
+  document.getElementById('fm-addr').value=f.addr||'';
+  document.getElementById('fm-id2').value=f.id2||'';
+  document.getElementById('fm-eid').value=f.id;
+  document.getElementById('fm-title').textContent='농가 수정';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteFarmer(id){
+  if(!confirm('삭제?')) return;
+  dbSet('farmers',dbGet('farmers',[]).filter(function(f){return f.id!==id;}));
+  renderFarmerList(''); toast('🗑 삭제됨');
+}
+function renderFarmerList(search){
+  search=(search||'').toLowerCase();
+  var farmers=dbGet('farmers',[]);
+  if(search) farmers=farmers.filter(function(f){return(f.name||'').toLowerCase().includes(search)||(f.tel||'').includes(search);});
+  var el=document.getElementById('farmer-list');
+  if(!farmers.length){el.innerHTML='<div class="empty"><div class="ei">👨‍🌾</div><p style="font-size:14px;font-weight:600">등록된 농가가 없습니다</p></div>';return;}
+  el.innerHTML='';
+  farmers.forEach(function(f){
+    var div=document.createElement('div'); div.className='fitem';
+    div.innerHTML='<div class="favt '+acColor(f.name)+'">'+esc((f.name||'?')[0])+'</div>'
+      +'<div class="fbd"><div class="fnm">'+esc(f.name)+'</div>'+(f.tel?'<div class="ftel">📞 '+esc(f.tel)+'</div>':'')+(f.addr?'<div class="ftel">📍 '+esc(f.addr)+'</div>':'')+'</div>'
+      +'<div class="fbts"></div>';
+    var bts=div.querySelector('.fbts');
+    if(f.tel){var cb=document.createElement('button');cb.className='fbt call';cb.innerHTML='📞';cb.onclick=function(){window.location.href='tel:'+f.tel.replace(/-/g,'');};bts.appendChild(cb);}
+    var eb=document.createElement('button');eb.className='fbt edit';eb.innerHTML='✏️';
+    eb.onclick=(function(id){return function(){editFarmer(id);};})(f.id); bts.appendChild(eb);
+    var db=document.createElement('button');db.className='fbt del';db.innerHTML='🗑';
+    db.onclick=(function(id){return function(){deleteFarmer(id);};})(f.id); bts.appendChild(db);
+    el.appendChild(div);
+  });
+}
+
+// ═══ 연락처 ═══
+var _allC=[];
+function importContact(){
+  if('contacts' in navigator && 'ContactsManager' in window){
+    navigator.contacts.select(['name','tel'],{multiple:false})
+      .then(function(contacts){
+        if(!contacts||!contacts.length) return;
+        var c=contacts[0];
+        document.getElementById('fm-name').value=(c.name&&c.name[0])||'';
+        document.getElementById('fm-tel').value=autoTelVal((c.tel&&c.tel[0])||'');
+        toast('✅ 연락처 불러오기 완료');
+      }).catch(function(){openContactSheet();});
+  } else { openContactSheet(); }
+}
+function openContactSheet(){
+  _allC=[];
+  document.getElementById('c-list').innerHTML='<div style="text-align:center;padding:24px;color:var(--t3)"><div style="font-size:36px;margin-bottom:8px">📋</div><div style="font-size:13px">연락처 불러오는 중...</div></div>';
+  document.getElementById('c-search').value='';
+  document.getElementById('contact-ov').classList.add('on');
+  if('contacts' in navigator && 'ContactsManager' in window){
+    navigator.contacts.select(['name','tel'],{multiple:true})
+      .then(function(contacts){
+        _allC=contacts.filter(function(c){return (c.name&&c.name[0])||(c.tel&&c.tel[0]);});
+        renderContactList(_allC);
+      }).catch(function(){showContactError();});
+  } else { showContactError(); }
+}
+function showContactError(){
+  var el=document.getElementById('c-list');
+  el.innerHTML='<div style="text-align:center;padding:24px"><div style="font-size:36px;margin-bottom:8px">⚠️</div>'
+    +'<div style="font-size:13px;color:var(--t2);margin-bottom:16px">연락처 접근이 안 됩니다.<br>아래에 직접 입력해주세요.</div>'
+    +'<div style="text-align:left">'
+    +'<div class="fg"><label class="fl">이름</label><input type="text" id="m-name" class="fi" placeholder="이름 입력"></div>'
+    +'<div class="fg"><label class="fl">전화번호</label><input type="tel" id="m-tel" class="fi" placeholder="010-0000-0000" oninput="autoTel(this)"></div>'
+    +'<div id="m-btn-area"></div>'
+    +'</div></div>';
+  var btn=document.createElement('button'); btn.className='btn btn-g btn-bl'; btn.style.marginTop='4px';
+  btn.textContent='✅ 적용'; btn.onclick=applyManual;
+  document.getElementById('m-btn-area').appendChild(btn);
+}
+function applyManual(){
+  var name=(document.getElementById('m-name').value||'').trim();
+  var tel=(document.getElementById('m-tel').value||'').trim();
+  if(!name){toast('⚠ 이름 입력');return;}
+  document.getElementById('fm-name').value=name;
+  document.getElementById('fm-tel').value=tel;
+  closeOv('contact-ov'); toast('✅ 적용 완료');
+}
+function renderContactList(list){
+  var el=document.getElementById('c-list');
+  if(!list||!list.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--t3)">연락처가 없습니다</div>';return;}
+  el.innerHTML='<div style="font-size:11px;color:var(--t3);margin-bottom:8px">총 '+list.length+'명</div>';
+  list.forEach(function(c,i){
+    var name=(c.name&&c.name[0])||'이름없음';
+    var tel=autoTelVal((c.tel&&c.tel[0])||'');
+    var div=document.createElement('div'); div.className='citem';
+    div.innerHTML='<div class="cavt '+acColor(name)+'">'+esc(name[0])+'</div>'
+      +'<div class="cbd"><div class="cnm">'+esc(name)+'</div>'+(tel?'<div class="ctel">'+esc(tel)+'</div>':'')+'</div>'
+      +'<span style="color:var(--g);font-size:12px;font-weight:700">선택</span>';
+    div.onclick=(function(idx){return function(){selectC(idx);};})(i);
+    el.appendChild(div);
+  });
+}
+function selectC(i){
+  var c=_allC[i]; if(!c) return;
+  document.getElementById('fm-name').value=(c.name&&c.name[0])||'';
+  document.getElementById('fm-tel').value=autoTelVal((c.tel&&c.tel[0])||'');
+  closeOv('contact-ov'); toast('✅ 선택 완료');
+}
+function filterC(search){
+  if(!_allC.length) return;
+  var q=search.toLowerCase();
+  var filtered=_allC.filter(function(c){
+    return((c.name&&c.name[0])||'').toLowerCase().includes(q)||((c.tel&&c.tel[0])||'').includes(q);
+  });
+  renderContactList(filtered);
+}
+
+// ═══ 거래명세서 항목 ═══
+var itemCnt=0, curTax='none';
+function addItem(data){
+  itemCnt++;
+  var id='it'+itemCnt;
+  var box=document.createElement('div'); box.id=id; box.className='ibox';
+  var delBtn=document.createElement('button'); delBtn.className='ibox-del'; delBtn.innerHTML='🗑';
+  delBtn.onclick=function(){box.remove();calcTotal();};
+  var no=document.createElement('div'); no.className='ibox-no'; no.textContent='#'+itemCnt+' 품목';
+  var nameRow=document.createElement('div'); nameRow.style.cssText='display:flex;gap:6px;margin-bottom:8px';
+  var nameIn=document.createElement('input'); nameIn.type='text'; nameIn.className='fi iname'; nameIn.placeholder='작업내용'; nameIn.style.flex='1'; nameIn.value=data?data.n:'';
+  var pickBtn=document.createElement('button'); pickBtn.style.cssText='width:40px;height:42px;border:1.5px solid var(--bd2);border-radius:var(--r2);background:var(--bg);cursor:pointer;font-size:17px;flex-shrink:0'; pickBtn.innerHTML='☰';
+  pickBtn.onclick=function(){togglePick(id);};
+  nameRow.appendChild(nameIn); nameRow.appendChild(pickBtn);
+  var grid=document.createElement('div'); grid.className='fr2';
+  var qIn=document.createElement('input'); qIn.type='text'; qIn.inputMode='numeric'; qIn.className='fi iqty'; qIn.placeholder='수량'; qIn.value=data&&data.q?data.q.toLocaleString():'';
+  qIn.addEventListener('input',function(){fmtNum(this);calcItem(id);});
+  var pIn=document.createElement('input'); pIn.type='text'; pIn.inputMode='numeric'; pIn.className='fi iunit'; pIn.placeholder='단가'; pIn.value=data&&data.p?data.p.toLocaleString():'';
+  pIn.addEventListener('input',function(){fmtNum(this);calcItem(id);});
+  var qW=document.createElement('div'); qW.className='fg'; qW.style.margin='0';
+  var qL=document.createElement('label'); qL.className='fl'; qL.textContent='수량'; qW.appendChild(qL); qW.appendChild(qIn);
+  var pW=document.createElement('div'); pW.className='fg'; pW.style.margin='0';
+  var pL=document.createElement('label'); pL.className='fl'; pL.textContent='단가'; pW.appendChild(pL); pW.appendChild(pIn);
+  grid.appendChild(qW); grid.appendChild(pW);
+  var sumDiv=document.createElement('div'); sumDiv.className='ibox-sum';
+  sumDiv.innerHTML='합계: <b class="iamt">'+((data&&data.a)?data.a.toLocaleString()+'원':'0원')+'</b>';
+  var pick=document.createElement('div'); pick.className='ppick'; pick.id='pp-'+id;
+  box.appendChild(no); box.appendChild(delBtn); box.appendChild(nameRow); box.appendChild(grid); box.appendChild(sumDiv); box.appendChild(pick);
+  document.getElementById('items-wrap').appendChild(box);
+  calcTotal();
+}
+function calcItem(id){
+  var b=document.getElementById(id); if(!b) return;
+  var q=parseNum(b.querySelector('.iqty').value);
+  var p=parseNum(b.querySelector('.iunit').value);
+  b.querySelector('.iamt').textContent=(q*p).toLocaleString()+'원';
+  calcTotal();
+}
+function setTax(t){
+  curTax=t;
+  ['none','vat','zero'].forEach(function(k){document.getElementById('tax-'+k).classList.toggle('on',k===t);});
+  calcTotal();
+}
+function calcTotal(){
+  var sub=0;
+  document.querySelectorAll('.ibox').forEach(function(b){sub+=parseNum(b.querySelector('.iqty').value)*parseNum(b.querySelector('.iunit').value);});
+  var tax=curTax==='vat'?Math.round(sub*.1):0;
+  var total=sub+tax;
+  document.getElementById('t-sub').textContent='&#8361;'+sub.toLocaleString();
+  document.getElementById('t-tax-row').style.display=curTax==='none'?'none':'flex';
+  if(curTax==='vat'){document.getElementById('t-tax-lbl').textContent='부가세(10%)';document.getElementById('t-tax').textContent='&#8361;'+tax.toLocaleString();}
+  if(curTax==='zero'){document.getElementById('t-tax-lbl').textContent='영세율(0%)';document.getElementById('t-tax').textContent='&#8361;0';}
+  document.getElementById('t-total').textContent='&#8361;'+total.toLocaleString();
+  return {sub:sub,tax:tax,total:total};
+}
+function togglePick(id){
+  var pick=document.getElementById('pp-'+id);
+  if(pick.style.display==='block'){pick.style.display='none';return;}
+  var units=dbGet('units',[{n:'방제비',p:60000},{n:'드론케어',p:8000},{n:'모두랑',p:23000},{n:'탄프로',p:15000},{n:'래빅사',p:25000}]);
+  pick.innerHTML='';
+  units.forEach(function(u){
+    var row=document.createElement('div'); row.className='ppick-row';
+    row.innerHTML='<span class="ppick-nm">'+esc(u.n)+'</span><span class="ppick-pr">'+u.p.toLocaleString()+'원</span>';
+    row.onclick=function(){
+      var b=document.getElementById(id); b.querySelector('.iname').value=u.n; b.querySelector('.iunit').value=u.p.toLocaleString(); calcItem(id); pick.style.display='none';
+    };
+    pick.appendChild(row);
+  });
+  pick.style.display='block';
+}
+
+// ═══ 저장 ═══
+function saveInvoice(){
+  var name=(document.getElementById('i-name').value||'').trim();
+  var date=document.getElementById('i-date').value;
+  if(!name){toast('⚠ 의뢰인을 입력하세요');return;}
+  var items=[];
+  document.querySelectorAll('.ibox').forEach(function(b){
+    var n=(b.querySelector('.iname').value||'').trim();
+    var q=parseNum(b.querySelector('.iqty').value);
+    var p=parseNum(b.querySelector('.iunit').value);
+    if(n||q||p) items.push({n:n||'-',q:q,p:p,a:q*p});
+  });
+  if(!items.length){toast('⚠ 항목을 추가하세요');return;}
+  var t=calcTotal();
+  var recs=dbGet('invoices',[]);
+  var id=editId||'R'+Date.now();
+  var rec={id:id,date:date,name:name,items:items,sub:t.sub,tax:t.tax,total:t.total,taxType:curTax,createdAt:new Date().toISOString(),paid:false};
+  if(editId){var idx=recs.findIndex(function(r){return r.id===editId;});if(idx>=0)recs[idx]=rec;else recs.unshift(rec);}
+  else recs.unshift(rec);
+  dbSet('invoices',recs); editId=null; curRec=rec;
+  toast('✅ 저장 완료!'); goInvTab('hist');
+}
+
+// ═══ 내역 ═══
+function renderHist(){
+  var recs=dbGet('invoices',[]);
+  var el=document.getElementById('hist-list');
+  if(!recs.length){el.innerHTML='<div class="empty"><div class="ei">📋</div><p style="font-size:14px;font-weight:600">저장된 명세서가 없습니다</p></div>';return;}
+  var groups={};
+  recs.forEach(function(r){var d=r.date||'날짜없음';if(!groups[d])groups[d]=[];groups[d].push(r);});
+  var dates=Object.keys(groups).sort(function(a,b){return b.localeCompare(a);});
+  el.innerHTML='';
+  dates.forEach(function(date){
+    var dh=document.createElement('div'); dh.className='hist-date'; dh.textContent=date; el.appendChild(dh);
+    groups[date].forEach(function(r){
+      var div=document.createElement('div'); div.className='hist-item';
+      var ic=document.createElement('div'); ic.className='hist-ic'; ic.textContent='📋';
+      var bd=document.createElement('div'); bd.className='hist-bd';
+      var nm=document.createElement('div'); nm.className='hist-nm'; nm.textContent=r.name;
+      var sub=document.createElement('div'); sub.className='hist-sub'; sub.textContent=(r.items||[]).map(function(i){return i.n;}).join(' · ');
+      var acts=document.createElement('div'); acts.className='hist-acts';
+      var pb=document.createElement('button'); pb.className='hist-act'; pb.innerHTML=r.paid?'💰':'✅';
+      pb.onclick=(function(rid,btn){return function(){togglePaid(rid,btn);};})(r.id,pb);
+      var eb=document.createElement('button'); eb.className='hist-act'; eb.innerHTML='✏️';
+      eb.onclick=(function(rid){return function(){editRec(rid);};})(r.id);
+      var db=document.createElement('button'); db.className='hist-act'; db.innerHTML='🗑';
+      db.onclick=(function(rid){return function(){deleteRec(rid);};})(r.id);
+      acts.appendChild(pb); acts.appendChild(eb); acts.appendChild(db);
+      bd.appendChild(nm); bd.appendChild(sub); bd.appendChild(acts);
+      var rt=document.createElement('div'); rt.className='hist-rt';
+      var amt=document.createElement('div'); amt.className='hist-amt'; amt.textContent='&#8361;'+numFmt(r.total);
+      var bdg=document.createElement('span'); bdg.className='bdg '+(r.paid?'bdg-g':'bdg-y'); bdg.style.cssText='display:block;margin-top:3px'; bdg.textContent=r.paid?'완납':'미수금';
+      var vb=document.createElement('button'); vb.className='btn btn-sm btn-ol no-print'; vb.style.marginTop='5px'; vb.textContent='상세';
+      vb.onclick=(function(rid){return function(){viewRec(rid);};})(r.id);
+      rt.appendChild(amt); rt.appendChild(bdg); rt.appendChild(vb);
+      div.appendChild(ic); div.appendChild(bd); div.appendChild(rt);
+      el.appendChild(div);
+    });
+  });
+}
+function togglePaid(id,btn){
+  var recs=dbGet('invoices',[]),r=recs.find(function(x){return x.id===id;}); if(!r) return;
+  r.paid=!r.paid; dbSet('invoices',recs); btn.innerHTML=r.paid?'💰':'✅';
+  toast(r.paid?'✅ 수납처리됨':'💰 미수금으로 변경'); renderHist(); renderLedger();
+}
+function editRec(id){
+  var recs=dbGet('invoices',[]),r=recs.find(function(x){return x.id===id;}); if(!r) return;
+  editId=r.id;
+  document.getElementById('i-date').value=r.date||'';
+  document.getElementById('i-name').value=r.name||'';
+  document.getElementById('items-wrap').innerHTML=''; itemCnt=0;
+  setTax(r.taxType||'none');
+  (r.items||[]).forEach(function(it){addItem(it);}); calcTotal();
+  goInvTab('input'); toast('✏️ 수정 모드');
+}
+function deleteRec(id){
+  if(!confirm('삭제할까요?')) return;
+  dbSet('invoices',dbGet('invoices',[]).filter(function(r){return r.id!==id;}));
+  renderHist(); renderLedger(); toast('🗑 삭제됨');
+}
+function viewRec(id){
+  var r=dbGet('invoices',[]).find(function(x){return x.id===id;}); if(!r) return;
+  curRec=r; renderInvoice(r); goInvTab('inv');
+}
+
+// ═══ 명세서 렌더링 ═══
+function renderInvoice(r){
+  var s=dbGet('settings',{});
+  var d=new Date(r.date||new Date());
+  var dateStr=d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';
+  var rows='';
+  for(var i=0;i<8;i++){
+    var it=r.items&&r.items[i];
+    if(it) rows+='<tr><td>'+esc(it.n)+'</td><td>'+numFmt(it.q)+'</td><td>'+numFmt(it.p)+'</td><td style="font-weight:700">'+numFmt(it.a)+'</td><td></td></tr>';
+    else rows+='<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>';
+  }
+  document.getElementById('inv-content').innerHTML=
+    '<div class="inv-wrap" id="inv-print">'
+    +'<div class="inv-title">항 공 방 제 명 세 서</div>'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:11px"><tr>'
+    +'<td style="vertical-align:top;padding-right:8px;white-space:nowrap;width:40%">'
+    +'<div>'+dateStr+'</div>'
+    +'<div style="font-size:15px;font-weight:900;margin-top:6px">'+esc(r.name||'')+'&nbsp;귀하</div>'
+    +'</td>'
+    +'<td style="vertical-align:top">'
+    +'<table style="width:100%;border-collapse:collapse;border:1px solid #000;font-size:10px">'
+    +'<tr><td rowspan="4" style="padding:3px;background:#f0f0f0;font-weight:700;text-align:center;border-right:1px solid #ccc;font-size:9px;writing-mode:vertical-lr">공급자</td>'
+    +'<td style="padding:3px 4px;background:#f8f8f8;font-weight:700;border-bottom:1px solid #ccc;border-right:1px solid #ccc;white-space:nowrap">등록번호</td>'
+    +'<td colspan="3" style="padding:3px 4px;border-bottom:1px solid #ccc">'+esc(s.biz||'')+'</td></tr>'
+    +'<tr><td style="padding:3px 4px;background:#f8f8f8;font-weight:700;border-bottom:1px solid #ccc;border-right:1px solid #ccc;white-space:nowrap">상호</td>'
+    +'<td style="padding:3px 4px;border-bottom:1px solid #ccc;border-right:1px solid #ccc">'+esc(s.comp||'')+'</td>'
+    +'<td style="padding:3px 4px;background:#f8f8f8;font-weight:700;border-bottom:1px solid #ccc;border-right:1px solid #ccc;white-space:nowrap">성명</td>'
+    +'<td style="padding:3px 4px;border-bottom:1px solid #ccc">'+esc(s.ceo||'')+'</td></tr>'
+    +'<tr><td style="padding:3px 4px;background:#f8f8f8;font-weight:700;border-bottom:1px solid #ccc;border-right:1px solid #ccc;white-space:nowrap">사업장</td>'
+    +'<td colspan="3" style="padding:3px 4px;border-bottom:1px solid #ccc;font-size:9px;word-break:break-all">'+esc(s.addr||'')+'</td></tr>'
+    +'<tr><td style="padding:3px 4px;background:#f8f8f8;font-weight:700;border-right:1px solid #ccc;white-space:nowrap">업태</td>'
+    +'<td style="padding:3px 4px;border-right:1px solid #ccc">'+esc(s.biz2||'')+'</td>'
+    +'<td style="padding:3px 4px;background:#f8f8f8;font-weight:700;border-right:1px solid #ccc;white-space:nowrap">종목</td>'
+    +'<td style="padding:3px 4px">'+esc(s.type||'')+'</td></tr>'
+    +'</table></td></tr></table>'
+    +'<div style="font-size:11px;margin-bottom:6px">아래와 같이 계산합니다.</div>'
+    +'<table class="inv-tbl"><thead><tr><th style="width:35%">품목</th><th>수량</th><th>단가</th><th>합계</th><th>비고</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody>'
+    +'<tfoot><tr style="background:#f5f5f5;font-weight:900"><td colspan="3" style="text-align:center">합계</td><td colspan="2" style="text-align:right;padding-right:6px">&#8361; '+numFmt(r.total)+'원</td></tr></tfoot>'
+    +'</table>'
+    +'<div class="inv-notice">'
+    +'1. 항공방제시 기재된 약제 외의 다른 약제는 의뢰자 개인요청 입니다.<br>'
+    +'2. 병충해의 100% 방제를 보장하지 않습니다.<br>'
+    +'3. 방제 후 결제는 당일 현장 결제를 원칙으로 합니다.'
+    +'</div>'
+    +(s.acc?'<div class="inv-acct">계좌번호 : '+esc(s.acc)+'</div>':'')
+    +'<div style="text-align:right;font-size:12px;margin-top:8px">의뢰인 :&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (인)</div>'
+    +(s.tel?'<div style="text-align:center;font-size:10px;color:#555;margin-top:8px;border-top:1px solid #eee;padding-top:6px">'+esc(s.comp||'')+'&nbsp;&nbsp;연락처: '+esc(s.tel)+'</div>':'')
+    +'</div>';
+  document.getElementById('inv-btns').style.display='flex';
+}
+
+// ═══ 이미지 저장 ═══
+async function saveImage(){
+  var el=document.getElementById('inv-print'); if(!el){toast('⚠ 명세서가 없습니다');return;}
+  document.getElementById('cap-ov').classList.add('on');
+  try{
+    var canvas=await html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    document.getElementById('cap-ov').classList.remove('on');
+    canvas.toBlob(async function(blob){
+      var r=curRec; var fname='명세서_'+(r?r.name:'')+'_'+(r?r.date:'')+'.png';
+      var file=new File([blob],fname,{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({title:'항공방제 명세서',files:[file]});}
+        catch(e){if(e.name!=='AbortError') downloadImg(canvas,fname);}
+      } else { downloadImg(canvas,fname); }
+    },'image/png');
+  }catch(e){document.getElementById('cap-ov').classList.remove('on');toast('⚠ 이미지 생성 실패');}
+}
+function downloadImg(canvas,fname){var a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download=fname;a.click();toast('✅ 이미지 저장 완료!');}
+
+// ═══ 문자/카톡 ═══
+function sendText(){
+  if(!curRec){toast('⚠ 명세서가 없습니다');return;}
+  var r=curRec; var s=dbGet('settings',{});
+  var NL='\n';
+  var lines=(r.items||[]).map(function(it){return it.n+' '+numFmt(it.q)+'개 x '+numFmt(it.p)+'원 = '+numFmt(it.a)+'원';}).join(NL);
+  var txt='[항공방제 거래명세서]'+NL+'방제일: '+r.date+NL+'의뢰인: '+r.name+NL+NL+lines+NL+NL+'합계: '+numFmt(r.total)+'원'+(r.taxType==='vat'?NL+'(부가세 '+numFmt(r.tax)+'원 포함)':'')+(s.acc?NL+NL+'계좌: '+s.acc:'')+(s.tel?NL+'연락처: '+s.tel:'');
+  if(navigator.share){navigator.share({title:'항공방제 거래명세서',text:txt}).catch(function(){});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){toast('📋 클립보드에 복사됨');});}
+}
+
+// ═══ 농가 선택 (명세서용) ═══
+function openFarmerPick(){
+  renderPickList(''); document.getElementById('fp-search').value='';
+  document.getElementById('farmer-pick-ov').classList.add('on');
+}
+function filterPickFarmers(q){renderPickList(q);}
+function renderPickList(q){
+  var farmers=dbGet('farmers',[]); var recs=dbGet('invoices',[]);
+  var names=[],seen={};
+  farmers.forEach(function(f){if(!seen[f.name]){names.push({name:f.name,tel:f.tel||''});seen[f.name]=1;}});
+  recs.forEach(function(r){if(r.name&&!seen[r.name]){names.push({name:r.name,tel:''});seen[r.name]=1;}});
+  if(q) names=names.filter(function(f){return f.name.includes(q);});
+  var el=document.getElementById('farmer-pick-list'); el.innerHTML='';
+  if(!names.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--t3)">없음</div>';return;}
+  names.forEach(function(f){
+    var div=document.createElement('div');
+    div.style.cssText='padding:13px 6px;border-bottom:1px solid var(--bd);cursor:pointer;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600';
+    div.innerHTML='<div class="favt '+acColor(f.name)+'">'+esc(f.name[0])+'</div><div><div>'+esc(f.name)+'</div>'+(f.tel?'<div style="font-size:11px;color:var(--t3)">'+esc(f.tel)+'</div>':'')+'</div>';
+    div.onclick=function(){document.getElementById('i-name').value=f.name;closeOv('farmer-pick-ov');};
+    el.appendChild(div);
+  });
+}
+
+// ═══ 장부 ═══
+function renderLedger(){
+  var recs=dbGet('invoices',[]); var pays=dbGet('payments',[]);
+  var names=[],seen={};
+  recs.forEach(function(r){if(r.name&&!seen[r.name]){names.push(r.name);seen[r.name]=1;}});
+  var totReq=recs.reduce(function(s,r){return s+(r.total||0);},0);
+  var totPaid=pays.reduce(function(s,p){return s+(p.amount||0);},0);
+  document.getElementById('l-req').textContent='&#8361;'+numFmt(totReq);
+  document.getElementById('l-paid').textContent='&#8361;'+numFmt(totPaid);
+  document.getElementById('l-bal').textContent='&#8361;'+numFmt(Math.max(0,totReq-totPaid));
+  var el=document.getElementById('ledger-list');
+  if(!names.length){el.innerHTML='<div class="empty"><div class="ei">📒</div><p>장부 내역이 없습니다</p></div>';return;}
+  el.innerHTML='';
+  names.forEach(function(name){
+    var req=recs.filter(function(r){return r.name===name;}).reduce(function(s,r){return s+(r.total||0);},0);
+    var paid=pays.filter(function(p){return p.farmer===name;}).reduce(function(s,p){return s+(p.amount||0);},0);
+    var bal=req-paid; var ok=bal<=0;
+    var card=document.createElement('div'); card.className='card'; card.style.marginBottom='8px';
+    var hd=document.createElement('div'); hd.style.cssText='display:flex;align-items:center;justify-content:space-between;cursor:pointer';
+    var hdL=document.createElement('div');
+    var nm=document.createElement('div'); nm.style.cssText='font-size:15px;font-weight:700'; nm.textContent=name;
+    var sb=document.createElement('div'); sb.style.cssText='font-size:11px;color:var(--t3);margin-top:2px'; sb.textContent='청구 &#8361;'+numFmt(req)+' · 입금 &#8361;'+numFmt(paid);
+    hdL.appendChild(nm); hdL.appendChild(sb);
+    var hdR=document.createElement('div'); hdR.style.cssText='font-size:15px;font-weight:900;color:'+(ok?'var(--g)':'var(--red)'); hdR.textContent=ok?'완납':'&#8361;'+numFmt(bal);
+    hd.appendChild(hdL); hd.appendChild(hdR);
+    var det=document.createElement('div'); det.style.cssText='display:none;margin-top:10px;border-top:1px solid var(--bd);padding-top:10px';
+    var r1=document.createElement('div'); r1.style.cssText='display:flex;justify-content:space-between;font-size:12px;padding:4px 0'; r1.innerHTML='<span>청구액</span><span style="font-weight:700">&#8361;'+numFmt(req)+'</span>';
+    var r2=document.createElement('div'); r2.style.cssText='display:flex;justify-content:space-between;font-size:12px;padding:4px 0'; r2.innerHTML='<span>입금액</span><span style="font-weight:700;color:var(--g)">&#8361;'+numFmt(paid)+'</span>';
+    var r3=document.createElement('div'); r3.style.cssText='display:flex;justify-content:space-between;font-size:12px;padding:4px 0;font-weight:700'; r3.innerHTML='<span>잔액</span><span style="color:'+(ok?'var(--g)':'var(--red)')+'">&#8361;'+numFmt(Math.max(0,bal))+'</span>';
+    var pb=document.createElement('button'); pb.className='btn btn-sm btn-g btn-bl'; pb.style.marginTop='8px'; pb.textContent='+ 입금 등록';
+    pb.onclick=(function(n){return function(e){e.stopPropagation();openPayFor(n);};})(name);
+    det.appendChild(r1); det.appendChild(r2); det.appendChild(r3); det.appendChild(pb);
+    hd.onclick=function(){det.style.display=det.style.display==='block'?'none':'block';};
+    card.appendChild(hd); card.appendChild(det); el.appendChild(card);
+  });
+}
+function setPayType(t){
+  ['cash','card','trans'].forEach(function(k){document.getElementById('pt-'+k).classList.toggle('on',k===t);});
+  document.getElementById('pay-type').value=t;
+}
+function openPayOv(){
+  var names=[],seen={};
+  dbGet('invoices',[]).forEach(function(r){if(r.name&&!seen[r.name]){names.push(r.name);seen[r.name]=1;}});
+  document.getElementById('pay-farmer').innerHTML='<option value="">-- 선택 --</option>'+names.map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+'</option>';}).join('');
+  document.getElementById('pay-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('pay-amt').value=''; document.getElementById('pay-memo').value='';
+  setPayType('cash');
+  document.getElementById('pay-ov').classList.add('on');
+}
+function openPayFor(name){openPayOv();setTimeout(function(){document.getElementById('pay-farmer').value=name;},50);}
+function savePay(){
+  var farmer=document.getElementById('pay-farmer').value;
+  var amt=parseNum(document.getElementById('pay-amt').value);
+  if(!farmer){toast('⚠ 농가를 선택하세요');return;}
+  if(!amt){toast('⚠ 입금액을 입력하세요');return;}
+  var pays=dbGet('payments',[]);
+  pays.unshift({id:'P'+Date.now(),farmer:farmer,date:document.getElementById('pay-date').value,amount:amt,type:document.getElementById('pay-type').value,memo:document.getElementById('pay-memo').value});
+  dbSet('payments',pays); closeOv('pay-ov'); renderLedger(); toast('✅ 입금 등록 완료');
+}
+
+// ═══ 설정 ═══
+function openSet(){
+  var s=dbGet('settings',{});
+  var m={biz:'s-biz',comp:'s-comp',ceo:'s-ceo',tel:'s-tel',addr:'s-addr',biz2:'s-biz2',type:'s-type',acc:'s-acc'};
+  Object.keys(m).forEach(function(k){var el=document.getElementById(m[k]);if(el)el.value=s[k]||'';});
+  renderUnitList(); document.getElementById('set-ov').classList.add('on');
+}
+function saveSettings(){
+  var s={};
+  var m={biz:'s-biz',comp:'s-comp',ceo:'s-ceo',tel:'s-tel',addr:'s-addr',biz2:'s-biz2',type:'s-type',acc:'s-acc'};
+  Object.keys(m).forEach(function(k){var el=document.getElementById(m[k]);if(el)s[k]=el.value;});
+  dbSet('settings',s); closeOv('set-ov'); toast('✅ 설정 저장됨');
+}
+function addUnit(){
+  var n=(document.getElementById('u-name').value||'').trim();
+  var p=parseNum(document.getElementById('u-price').value);
+  if(!n){toast('⚠ 품목명 입력');return;}
+  var units=dbGet('units',[]); units.push({n:n,p:p}); dbSet('units',units);
+  document.getElementById('u-name').value=''; document.getElementById('u-price').value='';
+  renderUnitList(); toast('✅ 추가됨');
+}
+function renderUnitList(){
+  var units=dbGet('units',[{n:'방제비',p:60000},{n:'드론케어',p:8000},{n:'모두랑',p:23000},{n:'탄프로',p:15000},{n:'래빅사',p:25000}]);
+  var el=document.getElementById('unit-list'); el.innerHTML='';
+  if(!units.length){el.innerHTML='<div style="text-align:center;padding:12px;color:var(--t3);font-size:13px">등록된 단가가 없습니다</div>';return;}
+  units.forEach(function(u,i){
+    var row=document.createElement('div'); row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--bd)';
+    var info=document.createElement('div');
+    var nm=document.createElement('div'); nm.style.fontWeight='700'; nm.textContent=u.n;
+    var pr=document.createElement('div'); pr.style.cssText='font-size:12px;color:var(--g)'; pr.textContent='&#8361;'+numFmt(u.p);
+    info.appendChild(nm); info.appendChild(pr);
+    var db=document.createElement('button'); db.style.cssText='background:none;border:none;font-size:17px;cursor:pointer;color:var(--red)'; db.textContent='🗑';
+    db.onclick=(function(idx){return function(){delUnit(idx);};})(i);
+    row.appendChild(info); row.appendChild(db); el.appendChild(row);
+  });
+}
+function delUnit(i){if(!confirm('삭제?')) return;var units=dbGet('units',[]);units.splice(i,1);dbSet('units',units);renderUnitList();}
+
+// ═══ 농사정보 ═══
+var _pestDB=[];
+var PESTI_KEY='pestiDB_v6';
+
+function goAgriTab(t){
+  curAgriTab=t;
+  ['pest','disease','weed'].forEach(function(x){
+    var el=document.getElementById('agri-'+x); if(el) el.style.display=x===t?'block':'none';
+    var tb=document.getElementById('atb-'+x); if(tb) tb.classList.toggle('on',x===t);
+  });
+  if(t==='pest'&&_pestDB.length===0) initPestDB();
+}
+function initPestDB(){
+  try{
+    var c=JSON.parse(localStorage.getItem(PESTI_KEY));
+    if(c&&c.ts&&(Date.now()-c.ts<7*24*3600*1000)&&c.data&&c.data.length>100){
+      _pestDB=c.data; setPestSbar('ready','✅ DB '+_pestDB.length.toLocaleString()+'건 준비 완료'); return;
+    }
+  }catch(e){}
+  setPestSbar('loading','📥 농약 DB 로딩 중...');
+  var xhr=new XMLHttpRequest(); xhr.open('GET','/pesti_data.json',true); xhr.timeout=30000;
+  xhr.onreadystatechange=function(){
+    if(xhr.readyState!==4) return;
+    if(xhr.status===200){
+      try{
+        _pestDB=JSON.parse(xhr.responseText);
+        try{localStorage.setItem(PESTI_KEY,JSON.stringify({ts:Date.now(),data:_pestDB}));}catch(e){}
+        setPestSbar('ready','✅ DB '+_pestDB.length.toLocaleString()+'건 준비 완료'); return;
+      }catch(e){}
+    }
+    setPestSbar('idle','🤖 AI 검색 모드');
+  };
+  xhr.onerror=function(){setPestSbar('idle','🤖 AI 검색 모드');};
+  xhr.send();
+}
+function setPestSbar(t,txt){
+  var el=document.getElementById('ap-sbar'); if(!el) return;
+  var colors={loading:'background:#fef3c7;color:#92400e',ready:'background:#dcfce7;color:#15803d',idle:'background:#eff6ff;color:#2563eb'};
+  el.style.cssText='padding:8px 12px;border-radius:10px;font-size:11px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;'+(colors[t]||colors.idle);
+  var icons={loading:'⏳',ready:'✅',idle:'💡'};
+  document.getElementById('ap-sbar-ic').textContent=icons[t]||'💡';
+  document.getElementById('ap-sbar-txt').textContent=txt;
+}
+function pestSearch(){
+  var brand=(document.getElementById('ap-brand').value||'').trim().toLowerCase();
+  var use  =(document.getElementById('ap-use').value||'').trim();
+  var crop =(document.getElementById('ap-crop').value||'').trim().toLowerCase();
+  var pest =(document.getElementById('ap-pest').value||'').trim().toLowerCase();
+  var comp =(document.getElementById('ap-comp').value||'').trim().toLowerCase();
+  if(!brand&&!use&&!crop&&!pest&&!comp){toast('⚠ 검색 조건을 입력하세요');return;}
+  var el=document.getElementById('ap-result');
+  if(_pestDB.length>0){
+    el.innerHTML='<div class="lbox"><div class="ls"></div><div style="font-size:13px">검색 중...</div></div>';
+    setTimeout(function(){
+      var found=_pestDB.filter(function(p){
+        if(brand&&(p.n||'').toLowerCase().indexOf(brand)<0) return false;
+        if(use  &&(p.t||'')!==use) return false;
+        if(crop &&(p.k||'').toLowerCase().indexOf(crop)<0) return false;
+        if(pest &&(p.p||'').toLowerCase().indexOf(pest)<0) return false;
+        if(comp &&(p.c||'').toLowerCase().indexOf(comp)<0&&(p.i||'').toLowerCase().indexOf(comp)<0) return false;
+        return true;
+      });
+      if(found.length>0){renderPestResults(found.slice(0,100),el,'db');return;}
+      pestAI(brand,use,crop,pest,comp,el);
+    },50);
+    return;
+  }
+  el.innerHTML='<div class="lbox"><div class="ls"></div><div style="font-size:13px">검색 중...</div></div>';
+  pestAI(brand,use,crop,pest,comp,el);
+}
+function pestReset(){
+  ['ap-brand','ap-crop','ap-pest','ap-comp'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('ap-use').value='';
+  document.getElementById('ap-result').innerHTML='<div class="empty"><div class="ei">🧪</div><p style="font-size:14px;font-weight:600">농약 검색</p></div>';
+}
+var _pestResults=[];
+var PICONS={살균제:'🍄',살충제:'🐛',제초제:'🌿',살균살충제:'⚡',생장조정제:'🌱'};
+function renderPestResults(list,el,src){
+  _pestResults=list;
+  var bdg=src==='db'
+    ?'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#dcfce7;color:#15803d">진흥청 DB</span>'
+    :'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#f3e8ff;color:#7c3aed">🤖 AI</span>';
+  el.innerHTML='<div style="font-size:12px;color:var(--t2);margin-bottom:9px;display:flex;align-items:center;justify-content:space-between"><span>총 <b style="color:var(--g)">'+list.length.toLocaleString()+'</b>건</span>'+bdg+'</div>';
+  list.forEach(function(p,i){
+    var t=p.t||p.useName||'';
+    var div=document.createElement('div');
+    div.style.cssText='background:#fff;border:1px solid var(--bd);border-radius:var(--r2);padding:12px;margin-bottom:7px;cursor:pointer;box-shadow:var(--sh);display:flex;align-items:flex-start;gap:9px';
+    div.innerHTML='<div style="width:38px;height:38px;border-radius:9px;background:var(--gm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">'+(PICONS[t]||'🧪')+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:14px;font-weight:800;color:var(--g);margin-bottom:2px">'+esc(p.n||p.pestiBrandName||'-')+'</div>'
+      +'<div style="font-size:11px;color:var(--t3);margin-bottom:5px">'+esc(p.c||p.compName||'')+(p.i||p.pestiKorName?' · '+esc(p.i||p.pestiKorName):'')+'</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px">'
+      +(t?'<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#dbeafe;color:#1e40af">'+esc(t)+'</span>':'')
+      +(p.k||p.cropName?'<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#dcfce7;color:#15803d">'+esc(p.k||p.cropName)+'</span>':'')
+      +(p.p||p.diseaseWeedName?'<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#fff3e0;color:#e65100">'+esc(p.p||p.diseaseWeedName)+'</span>':'')
+      +'</div></div>'
+      +'<span style="color:var(--t3);font-size:18px;align-self:center">›</span>';
+    div.onclick=(function(idx){return function(){showPestDetail(idx);};})(i);
+    el.appendChild(div);
+  });
+}
+function showPestDetail(i){
+  var p=_pestResults[i]; if(!p) return;
+  var ovId='pest-detail-ov';
+  var ov=document.getElementById(ovId);
+  if(!ov){
+    ov=document.createElement('div'); ov.id=ovId; ov.className='ov';
+    var shEl=document.createElement('div'); shEl.className='sh';
+    shEl.innerHTML='<div class="sh-hnd"></div><div id="pd-nm" style="font-size:18px;font-weight:800;color:var(--g);margin-bottom:2px"></div><div id="pd-cp" style="font-size:12px;color:var(--t3);margin-bottom:14px"></div><div id="pd-rows"></div>';
+    var closeBtn=document.createElement('button'); closeBtn.className='btn btn-gray btn-bl'; closeBtn.style.marginTop='14px'; closeBtn.textContent='닫기';
+    closeBtn.onclick=function(){ov.classList.remove('on');};
+    shEl.appendChild(closeBtn); ov.appendChild(shEl);
+    ov.onclick=function(e){if(e.target===ov)ov.classList.remove('on');};
+    document.body.appendChild(ov);
+  }
+  document.getElementById('pd-nm').textContent=p.n||p.pestiBrandName||'-';
+  document.getElementById('pd-cp').textContent=p.c||p.compName||'';
+  var rows=[
+    ['상표명',p.n||p.pestiBrandName],['품목명',p.i||p.pestiKorName],
+    ['용도',p.t||p.useName],['회사명',p.c||p.compName],
+    ['적용작물',p.k||p.cropName],['적용병해충',p.p||p.diseaseWeedName],
+    ['사용방법',p.m||p.pestiUse],['희석배수',p.d||p.dilutUnit],
+    ['안전사용기준(수확전)',p.s||p.useSuittime],['사용횟수',p.u||p.useNum]
+  ].filter(function(r){return r[1];});
+  document.getElementById('pd-rows').innerHTML=rows.map(function(r){
+    var safe=r[0].indexOf('안전사용')>=0;
+    return safe
+      ?'<div style="background:#fff8f0;border-radius:8px;padding:9px 10px;margin-top:4px;display:flex;gap:8px"><div style="width:110px;font-size:12px;font-weight:700;color:#e07b39;flex-shrink:0">'+r[0]+'</div><div style="font-size:14px;color:#e07b39;font-weight:700;flex:1">'+esc(String(r[1]))+'</div></div>'
+      :'<div style="display:flex;padding:9px 0;border-bottom:1px solid var(--bd)"><div style="width:110px;font-size:12px;font-weight:700;color:var(--t2);flex-shrink:0">'+r[0]+'</div><div style="font-size:13px;color:var(--t1);flex:1;line-height:1.5">'+esc(String(r[1]))+'</div></div>';
+  }).join('');
+  ov.classList.add('on');
+}
+function pestAI(brand,use,crop,pest,comp,el){
+  el.innerHTML='<div class="lbox"><div class="ls"></div><div style="font-size:13px">🤖 AI 검색 중...</div></div>';
+  var q='';
+  if(brand) q+='상표명:'+brand+' '; if(use) q+='용도:'+use+' ';
+  if(crop) q+='작물:'+crop+' '; if(pest) q+='병해충:'+pest+' '; if(comp) q+='회사/주성분:'+comp+' ';
+  var prompt='한국 농촌진흥청 등록 농약. 검색:'+q.trim()+'. JSON 배열로만(마크다운없이,최대15개):[{"n":"상표명","c":"회사명","t":"살균제/살충제/제초제","i":"품목명","k":"작물명","p":"병해충명","d":"희석배수","s":"안전사용기준","u":"횟수"}]';
+  var xhr=new XMLHttpRequest(); xhr.open('POST','https://api.anthropic.com/v1/messages',true);
+  xhr.setRequestHeader('Content-Type','application/json'); xhr.timeout=25000;
+  xhr.onreadystatechange=function(){
+    if(xhr.readyState!==4) return;
+    if(xhr.status===200){
+      try{
+        var d=JSON.parse(xhr.responseText);
+        var txt=(d.content&&d.content[0]?d.content[0].text:'').replace(/```json|```/g,'').trim();
+        var list=JSON.parse(txt);
+        if(Array.isArray(list)&&list.length>0){renderPestResults(list,el,'ai');return;}
+      }catch(e){}
+    }
+    el.innerHTML='<div class="empty"><div class="ei">🔍</div><p style="font-size:14px;font-weight:600">검색 결과 없음</p></div>';
+  };
+  xhr.onerror=function(){el.innerHTML='<div class="empty"><div class="ei">🔍</div><p>검색 결과 없음</p></div>';};
+  xhr.send(JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]}));
+}
+
+// ═══ 초기화 ═══
+(function(){
+  document.getElementById('i-date').value=new Date().toISOString().split('T')[0];
+  addItem();
+  ['farmer-pick-ov','pay-ov','contact-ov'].forEach(function(id){
+    document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeOv(id);});
+  });
+  renderHome();
+  // Service Worker 등록 (PWA)
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/namil/sw.js').catch(function(){});
+  }
+  // Median.co 네이티브 브릿지 - 상단바 숨기기
+  if(window.gonative||window.median){
+    try{
+      if(window.gonative&&gonative.navigationbar){
+        gonative.navigationbar.hide();
+      }
+      if(window.median&&median.navigationbar){
+        median.navigationbar.hide();
+      }
+    }catch(e){}
+  }
+})();
+
+
+
+
+
+</script>
+</body>
+</html>
