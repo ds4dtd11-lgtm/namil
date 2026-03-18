@@ -1,1 +1,9 @@
 
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.ds4dtd11_lgtm.twa",
+        "sha256_cert_fingerprints": ["C3:CB:C9:0C:E8:D9:D4:21:97:1F:44:50:45:1D:2B:07:35:FD:D6:4B:C0:B2:79:65:57:4A:13:4A:84:A6:8D:2B"]
+      }
+    }]
